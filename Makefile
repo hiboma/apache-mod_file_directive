@@ -45,3 +45,5 @@ restart:
 stop:
 	$(APACHECTL) stop
 
+tidy:
+	indent -i4 -npsl -di0 -br -nce -d0 -cli0 -npcs -nfc1 -nut mod_file_directive.c
