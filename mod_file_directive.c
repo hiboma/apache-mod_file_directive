@@ -21,7 +21,7 @@
 **
 **    $ apachectl restart
 **
-*/ 
+*/
 
 #include "httpd.h"
 #include "http_config.h"
@@ -29,81 +29,78 @@
 #include "http_log.h"
 #include "ap_config.h"
 
-static int is_file_exists(cmd_parms *cmd, const char *path)
+static int is_file_exists(cmd_parms * cmd, const char *path)
 {
     apr_finfo_t finfo;
 
-    if(apr_stat(&finfo, path, APR_FINFO_TYPE, cmd->pool) == APR_SUCCESS) {
+    if (apr_stat(&finfo, path, APR_FINFO_TYPE, cmd->pool) == APR_SUCCESS) {
         ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
-                      cmd->pool,
-                      "File exits: %s", path);
+                      cmd->pool, "File exits: %s", path);
         return true;
     }
     else {
         ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
-                      cmd->pool,
-                      "File not exits: %s", path);
+                      cmd->pool, "File not exits: %s", path);
         return false;
     }
 }
 
-static const char *start_if_file_exists(cmd_parms *cmd, void *dummy, const char *arg)
+static const char *start_if_file_exists(cmd_parms * cmd, void *dummy,
+                                        const char *arg)
 {
-    const char *endp, *file;
+    const char *endp;
+    char *path;
     int exists;
     int not = 0;
 
     endp = ap_strrchr_c(arg, '>');
     if (endp == NULL) {
-        return (char *)apr_pstrcat(cmd->pool, cmd->cmd->name,
-                          "> directive missing closing '>'", NULL);
+        return (char *) apr_pstrcat(cmd->pool, cmd->cmd->name,
+                                    "> directive missing closing '>'", NULL);
     }
 
-    arg = apr_pstrndup(cmd->temp_pool, arg, endp - arg);
+    path = apr_pstrndup(cmd->temp_pool, arg, endp - arg);
 
-    if (arg[0] == '!') {
+    if (path[0] == '!') {
         not = 1;
-        arg++;
+        path++;
     }
 
-    if (arg[0] == '/') {
-        file = arg;
-    } else {
-        file = ap_server_root_relative(cmd->temp_pool, arg);
+    if (path[0] != '/') {
+        path = ap_server_root_relative(cmd->temp_pool, path);
     }
 
-    exists = is_file_exists(cmd, file);
-    if((!not && exists) || (not && !exists)) {
+    exists = is_file_exists(cmd, path);
+    if ((!not && exists) || (not && !exists)) {
         ap_directive_t *parent = NULL;
         ap_directive_t *current = NULL;
         const char *retval;
 
         retval = ap_build_cont_config(cmd->pool, cmd->temp_pool, cmd,
                                       &current, &parent, "<IfFileExists");
-        *(ap_directive_t **)dummy = current;
+        *(ap_directive_t **) dummy = current;
         return retval;
     }
     else {
-        *(ap_directive_t **)dummy = NULL;
+        *(ap_directive_t **) dummy = NULL;
         return ap_soak_end_container(cmd, "<IfFileExists");
     }
 }
 
-static const command_rec file_directive_cmds[] =
-{
-    AP_INIT_TAKE1("<IfFileExists", start_if_file_exists, NULL, EXEC_ON_READ | RSRC_CONF,
+static const command_rec file_directive_cmds[] = {
+    AP_INIT_TAKE1("<IfFileExists", start_if_file_exists, NULL,
+                  EXEC_ON_READ | RSRC_CONF,
                   "Container for directives based on existance of specific file"),
     NULL,
 };
 
 /* Dispatch list for API hooks */
 module AP_MODULE_DECLARE_DATA file_directive_module = {
-    STANDARD20_MODULE_STUFF, 
-    NULL,                  /* create per-dir    config structures */
-    NULL,                  /* merge  per-dir    config structures */
-    NULL,                  /* create per-server config structures */
-    NULL,                  /* merge  per-server config structures */
-    file_directive_cmds,  /* table of config file commands       */
-    NULL,  /* register hooks                      */
+    STANDARD20_MODULE_STUFF,
+    NULL,                       /* create per-dir    config structures */
+    NULL,                       /* merge  per-dir    config structures */
+    NULL,                       /* create per-server config structures */
+    NULL,                       /* merge  per-server config structures */
+    file_directive_cmds,        /* table of config file commands       */
+    NULL,                       /* register hooks                      */
 };
-
