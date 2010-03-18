@@ -32,27 +32,24 @@
 static int is_file_exists(cmd_parms *cmd, const char *path)
 {
     apr_finfo_t finfo;
-    const char *fname;
 
-    fname = ap_server_root_relative(cmd->pool, path);
-
-    if(apr_stat(&finfo, fname, APR_FINFO_TYPE, cmd->pool) == APR_SUCCESS) {
+    if(apr_stat(&finfo, path, APR_FINFO_TYPE, cmd->pool) == APR_SUCCESS) {
         ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
                       cmd->pool,
-                      "File exits: %s", fname);
+                      "File exits: %s", path);
         return true;
     }
     else {
         ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
                       cmd->pool,
-                      "File not exits: %s", fname);
+                      "File not exits: %s", path);
         return false;
     }
 }
 
 static const char *start_if_file_exists(cmd_parms *cmd, void *dummy, const char *arg)
 {
-    const char *endp;
+    const char *endp, *file;
     int exists;
     int not = 0;
 
@@ -61,14 +58,20 @@ static const char *start_if_file_exists(cmd_parms *cmd, void *dummy, const char 
         return unclosed_directive(cmd);
     }
 
-    arg = apr_pstrndup(cmd->pool, arg, endp - arg);
+    arg = apr_pstrndup(cmd->temp_pool, arg, endp - arg);
 
     if (arg[0] == '!') {
         not = 1;
         arg++;
     }
 
-    exists = is_file_exists(cmd, arg);
+    if (arg[0] == '/') {
+        file = arg;
+    } else {
+        file = ap_server_root_relative(cmd->temp_pool, arg);
+    }
+
+    exists = is_file_exists(cmd, file);
     if((!not && exists) || (not && !exists)) {
         ap_directive_t *parent = NULL;
         ap_directive_t *current = NULL;
