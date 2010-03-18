@@ -55,7 +55,8 @@ static const char *start_if_file_exists(cmd_parms *cmd, void *dummy, const char 
 
     endp = ap_strrchr_c(arg, '>');
     if (endp == NULL) {
-        return unclosed_directive(cmd);
+        return (char *)apr_pstrcat(cmd->pool, cmd->cmd->name,
+                          "> directive missing closing '>'", NULL);
     }
 
     arg = apr_pstrndup(cmd->temp_pool, arg, endp - arg);
