@@ -29,6 +29,8 @@
 #include "http_log.h"
 #include "ap_config.h"
 
+#include <stdbool.h>
+
 static int is_file_exists(cmd_parms * cmd, const char *path)
 {
     apr_finfo_t finfo;
@@ -55,8 +57,9 @@ static const char *start_if_file_exists(cmd_parms * cmd, void *dummy,
 
     endp = ap_strrchr_c(arg, '>');
     if (endp == NULL) {
-        return (char *) apr_pstrcat(cmd->pool, cmd->cmd->name,
-                                    "> directive missing closing '>'", NULL);
+        return (const char *) apr_pstrcat(cmd->pool, cmd->cmd->name,
+                                          "> directive missing closing '>'",
+                                          NULL);
     }
 
     path = apr_pstrndup(cmd->temp_pool, arg, endp - arg);
