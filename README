@@ -7,6 +7,20 @@ description
 ------------
 
     o ファイルの有無を見て設定を変更可能にするApacheモジュールです
+
+------------
+install
+------------
+
+    o パスは適宜変更してください。ちゃんとした書き方が分からんとです
+
+         make basedir=/usr/local/apache2
+         make basedir=/usr/local/apache2 install
+
+    o apxsを直接扱う場合
+
+              apxs -c mod_file_directive.c
+         sudo apxs -c mod_file_directive.c install
 	
 ------------
 usage
