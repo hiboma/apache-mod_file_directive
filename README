@@ -1,0 +1,40 @@
+ 
+                         mod_file_directive.so
+                 =======================================
+
+------------
+description
+------------
+
+    o ファイルの有無を見て設定を変更可能にするApacheモジュールです
+	
+------------
+usage
+------------
+
+    o 下記の様な使い方になります
+
+         LoadModule file_directive_module modules/mod_file_directive.so
+
+         # anyfileが存在していたら有効になる
+	 <IfFileExists /path/to/anyfile>
+	     DoSomething 
+         </IfFileExists>
+
+    o VirtualHostディレクティブのコンテキスト内でも有効です使えます
+    o またIncludeと組み合わせて使う事もできます
+	 
+         <VirtualHost *>
+             DocumentRoot /www/docs/example.com
+             ServerName   example.com
+             <IfFileExists /path/to/anyfile>
+                 # anyfileが存在していたらIncludeする
+                 Include some-extra.conf
+             </IfFileExists>
+         </VirtualHost>
+
+------------
+notice
+------------
+
+    o <IfFileExists> を呼び出す前に LoadModule してください
