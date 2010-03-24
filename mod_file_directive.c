@@ -36,12 +36,12 @@ static int is_file_exists(cmd_parms * cmd, const char *path)
     apr_finfo_t finfo;
 
     if (apr_stat(&finfo, path, APR_FINFO_TYPE, cmd->pool) == APR_SUCCESS) {
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
+        ap_log_error(APLOG_MARK, APLOG_DEBUG, 0,
                       cmd->pool, "File exits: %s", path);
         return true;
     }
     else {
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
+        ap_log_error(APLOG_MARK, APLOG_DEBUG, 0,
                       cmd->pool, "File not exits: %s", path);
         return false;
     }
