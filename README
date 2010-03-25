@@ -48,6 +48,36 @@ usage
          </VirtualHost>
 
 ------------
+test
+------------
+
+    o 下記の様な手順でテストできます。あえて記述ミスした設定を用意します。
+
+        $ vi /path/to/file_directive_test.conf
+	
+            LoadModule file_directive_module modules/mod_file_directive.so
+            <IfFileExists /tmp>
+                HogeHoge
+            </IfFileExists>
+
+	# シンタックスエラーが出たらテストOK
+        $ htpd -t -f /path/to/file_directive_test.conf
+	Syntax error on line 3 of /path/to/file_directive_test.conf:
+	Invalid command 'HogeHoge', perhaps mis-spelled or defined by a module not included in the server configuration
+
+	
+        $ vi /path/to/file_directive_test.conf	
+
+            LoadModule file_directive_module modules/mod_file_directive.so
+            <IfFileExists !/tmp>
+                HogeHoge
+            </IfFileExists>
+
+        # Syntax OK が出たらテストOK
+        $ htpd -t -f /path/to/file_directive_test.conf
+	Syntax OK
+
+------------
 notice
 ------------
 
