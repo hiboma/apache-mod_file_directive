@@ -1,84 +1,34 @@
  
-                         mod_file_directive.so
-                 =======================================
+# mod_file_directive
+  
+## DESCRIPTION
 
-------------
-description
-------------
+An Apache module provides `<IfFileExists ...>` conditinal directive checking that specified file exists or not.
 
-    o ファイルの有無を見て設定を変更可能にするApacheモジュールです
+## INSTALL
 
-------------
-install
-------------
+```
+sudo apxs -i -c mod_file_directive.c
+```
 
-    o パスは適宜変更してください。ちゃんとした書き方が分からんとです
+## USAGE
 
-         make basedir=/usr/local/apache2
-         make basedir=/usr/local/apache2 install
+```
+LoadModule file_directive_module modules/mod_file_directive.so
 
-    o apxsを直接扱う場合
+<IfFileExists /path/to/anyfile>
+  DoSomething
+</IfFileExists>
+```
 
-              apxs -c mod_file_directive.c
-         sudo apxs -c mod_file_directive.c install
-	
-------------
-usage
-------------
+Inside `<Virtualhost>` with `Include`
 
-    o 下記の様な使い方になります
-
-         LoadModule file_directive_module modules/mod_file_directive.so
-
-         # anyfileが存在していたら有効になる
-	 <IfFileExists /path/to/anyfile>
-	     DoSomething 
-         </IfFileExists>
-
-    o VirtualHostディレクティブのコンテキスト内でも有効です使えます
-    o またIncludeと組み合わせて使う事もできます
-	 
-         <VirtualHost *>
-             DocumentRoot /www/docs/example.com
-             ServerName   example.com
-             <IfFileExists /path/to/anyfile>
-                 # anyfileが存在していたらIncludeする
-                 Include some-extra.conf
-             </IfFileExists>
-         </VirtualHost>
-
-------------
-test
-------------
-
-    o 下記の様な手順でテストできます。あえて記述ミスした設定を用意します。
-
-        $ vi /path/to/file_directive_test.conf
-	
-            LoadModule file_directive_module modules/mod_file_directive.so
-            <IfFileExists /tmp>
-                HogeHoge
-            </IfFileExists>
-
-	# シンタックスエラーが出たらテストOK
-        $ htpd -t -f /path/to/file_directive_test.conf
-	Syntax error on line 3 of /path/to/file_directive_test.conf:
-	Invalid command 'HogeHoge', perhaps mis-spelled or defined by a module not included in the server configuration
-
-	
-        $ vi /path/to/file_directive_test.conf	
-
-            LoadModule file_directive_module modules/mod_file_directive.so
-            <IfFileExists !/tmp>
-                HogeHoge
-            </IfFileExists>
-
-        # Syntax OK が出たらテストOK
-        $ htpd -t -f /path/to/file_directive_test.conf
-	Syntax OK
-
-------------
-notice
-------------
-
-    o <IfFileExists> を呼び出す前に LoadModule してください
+```
+<VirtualHost *>
+    DocumentRoot /www/docs/example.com
+    ServerName   example.com
+    <IfFileExists /path/to/anyfile>
+        Include some-extra.conf
+    </IfFileExists>
+</VirtualHost>
+```
