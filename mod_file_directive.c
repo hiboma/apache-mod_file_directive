@@ -28,6 +28,7 @@
 #include "http_protocol.h"
 #include "http_log.h"
 #include "ap_config.h"
+#include "apr_strings.h"
 
 #include <stdbool.h>
 
